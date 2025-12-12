@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTs MQ Tebuireng Putri - Cerdas, Qur'ani, Berprestasi</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#047857', 
+                        primaryDark: '#064E3B',
+                        secondary: '#F59E0B', 
+                        accent: '#F0FDF4', 
+                        dark: '#111827',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['Amiri', 'serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body { overflow-x: hidden; background-color: #F9FAFB; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #047857; border-radius: 4px; }
+
+        /* --- Animations --- */
+        .anim-hidden { opacity: 0; }
+        
+        .anim-fade-up.active { animation: fadeUp 1s ease-out forwards; }
+        .anim-fade-left.active { animation: fadeLeft 1s ease-out forwards; }
+        .anim-fade-right.active { animation: fadeRight 1s ease-out forwards; }
+        .anim-zoom-in.active { animation: zoomIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .anim-flip-up.active { animation: flipUp 0.8s ease-out forwards; }
+        .anim-rotate-in.active { animation: rotateIn 1s ease-out forwards; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+        @keyframes flipUp { from { opacity: 0; transform: perspective(1000px) rotateX(90deg); } to { opacity: 1; transform: perspective(1000px) rotateX(0deg); } }
+        @keyframes rotateIn { from { opacity: 0; transform: rotate(-10deg) scale(0.9); } to { opacity: 1; transform: rotate(0) scale(1); } }
+
+        /* --- Page Switcher --- */
+        .page-section { display: none; animation: pageFadeIn 0.5s ease-out; }
+        .page-section.active-page { display: block; }
+        @keyframes pageFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .nav-link.active { color: #047857; font-weight: 700; position: relative; }
+        .nav-link.active::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background-color: #F59E0B; border-radius: 10px; }
+        
+        /* Slider Styles */
+        .slider-container { display: flex; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; height: 100%; }
+        .slide { min-width: 100%; height: 100%; position: relative; flex-shrink: 0; }
+        
+        /* Image Hover Zoom */
+        .img-hover-zoom { overflow: hidden; }
+        .img-hover-zoom img { transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
+        .img-hover-zoom:hover img { transform: scale(1.1); }
+        
+        /* Timeline styling for History */
+        .timeline-item { position: relative; padding-left: 2rem; border-left: 2px solid #e5e7eb; margin-bottom: 2rem; }
+        .timeline-item::before { content: ''; position: absolute; left: -0.4rem; top: 0.25rem; width: 0.8rem; height: 0.8rem; background: #047857; border-radius: 50%; border: 2px solid white; }
+
+        /* Extra Page Specific */
+        .extra-card-overlay { background: linear-gradient(to top, rgba(4, 72, 55, 0.9) 0%, rgba(4, 72, 55, 0.4) 60%, transparent 100%); }
+    </style>
+</head>
+<body class="text-gray-800 font-sans antialiased">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 transition-all duration-300 bg-white/90 backdrop-blur-xl border-b border-gray-100" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer group" onclick="switchPage('home')">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-primaryDark rounded-xl flex items-center justify-center text-white font-bold text-xl font-serif shadow-lg group-hover:animate-pulse">MQ</div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-lg text-primary tracking-tight">MTs MQ Putri</span>
+                        <span class="text-[10px] text-gray-500 font-bold tracking-widest uppercase">Tebuireng</span>
+                    </div>
+                </div>
+                <!-- Extended Menu (Desktop) -->
+                <div class="hidden xl:flex space-x-5 items-center text-sm">
+                    <button onclick="switchPage('home')" class="nav-link active font-medium hover:text-primary transition" data-target="home">Beranda</button>
+                    <button onclick="switchPage('profil')" class="nav-link font-medium hover:text-primary transition" data-target="profil">Profil</button>
+                    <button onclick="switchPage('extra')" class="nav-link font-medium hover:text-primary transition" data-target="extra">Ekstrakurikuler</button>
+                    <button onclick="switchPage('prestasi')" class="nav-link font-medium hover:text-primary transition" data-target="prestasi">Prestasi</button>
+                    <button onclick="switchPage('galeri')" class="nav-link font-medium hover:text-primary transition" data-target="galeri">Galeri</button>
+                    <button onclick="switchPage('alumni')" class="nav-link font-medium hover:text-primary transition" data-target="alumni">Alumni</button>
+                    <button onclick="switchPage('news')" class="nav-link font-medium hover:text-primary transition" data-target="news">Berita</button>
+                    <button onclick="scrollToSection('ppdb')" class="bg-gradient-to-r from-secondary to-yellow-600 text-white px-5 py-2 rounded-full font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition">PPDB</button>
+                </div>
+                <!-- Mobile Button -->
+                <div class="xl:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="p-2 text-gray-600 hover:text-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"><i class="fas fa-bars text-xl"></i></button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden xl:hidden bg-white/95 backdrop-blur-md border-t absolute w-full shadow-xl max-h-[85vh] overflow-y-auto">
+            <div class="p-4 space-y-2">
+                <button onclick="switchPage('home')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-green-50 font-medium text-gray-700">Beranda</button>
+                <button onclick="switchPage('profil')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-green-50 font-medium text-gray-700">Profil</button>
+                <button onclick="switchPage('extra')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-green-50 font-medium text-gray-700">Ekstrakurikuler</button>
+                <button onclick="switchPage('prestasi')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-green-50 font-medium text-gray-700">Prestasi</button>
+                <button onclick="switchPage('galeri')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-green-50 font-medium text-gray-700">Galeri</button>
+                <button onclick="switchPage('alumni')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-green-50 font-medium text-gray-700">Alumni</button>
+                <button onclick="switchPage('news')" class="block w-full text-left px-4 py-3 rounded-lg hover:bg-green-50 font-medium text-gray-700">Berita</button>
+                <button onclick="scrollToSection('ppdb')" class="block w-full text-left px-4 py-3 rounded-lg bg-primary text-white font-bold mt-4">Daftar PPDB</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- =========================================
+         PAGE: HOME (BERANDA)
+    ========================================== -->
+    <main id="page-home" class="page-section active-page">
+        <!-- Hero Slider (Pilihan User) -->
+        <section class="relative h-screen overflow-hidden">
+            <div class="slider-container" id="hero-slider">
+                <div class="slide bg-gray-900">
+                    <img src="https://images.unsplash.com/photo-1596495578065-6e0763fa1178?q=80&w=2070" class="w-full h-full object-cover opacity-60">
+                    <div class="absolute inset-0 flex items-center justify-center text-center px-4">
+                        <div class="max-w-4xl pt-20">
+                            <h1 class="text-4xl md:text-7xl font-bold text-white mb-6 font-serif drop-shadow-lg anim-zoom-in anim-hidden">Generasi <span class="text-secondary italic">Qur'ani</span></h1>
+                            <p class="text-lg md:text-xl text-gray-200 mb-8 font-light anim-fade-up anim-hidden delay-100">Membentuk pribadi santriwati yang intelek, spiritual, dan berakhlakul karimah.</p>
+                            <button onclick="scrollToSection('ppdb')" class="bg-secondary hover:bg-yellow-600 text-white px-8 py-3 rounded-full font-bold shadow-lg anim-flip-up anim-hidden delay-200 transition transform hover:scale-105">Daftar Sekarang</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slide bg-primaryDark">
+                    <img src="https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=2070" class="w-full h-full object-cover opacity-50" loading="lazy">
+                    <div class="absolute inset-0 flex items-center justify-center text-center px-4">
+                        <div class="max-w-4xl pt-20">
+                            <h1 class="text-4xl md:text-7xl font-bold text-white mb-6 font-serif drop-shadow-lg">Unggul dalam <span class="text-secondary">Prestasi</span></h1>
+                            <p class="text-lg md:text-xl text-gray-200 mb-8 font-light">Mencetak juara di bidang akademik, sains, dan seni islami tingkat nasional.</p>
+                             <button onclick="switchPage('prestasi')" class="bg-white text-primary px-8 py-3 rounded-full font-bold shadow-lg hover:bg-gray-100 transition transform hover:scale-105">Lihat Prestasi Kami</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slider Controls -->
+            <button onclick="moveSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur hover:bg-white/40 text-white flex items-center justify-center z-20 transition"><i class="fas fa-chevron-left"></i></button>
+            <button onclick="moveSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur hover:bg-white/40 text-white flex items-center justify-center z-20 transition"><i class="fas fa-chevron-right"></i></button>
+        </section>
+
+        <!-- Stats Section (Counter) -->
+        <section class="py-16 bg-primaryDark text-white relative overflow-hidden stats-section">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/10">
+                    <div class="anim-fade-up anim-hidden">
+                        <div class="text-4xl md:text-6xl font-bold text-secondary mb-2 font-serif counter" data-target="1520">0</div>
+                        <div class="text-xs md:text-sm uppercase tracking-widest opacity-80 font-bold">Total Alumni</div>
+                    </div>
+                    <div class="anim-fade-up anim-hidden delay-100">
+                        <div class="text-4xl md:text-6xl font-bold text-secondary mb-2 font-serif counter" data-target="350">0</div>
+                        <div class="text-xs md:text-sm uppercase tracking-widest opacity-80 font-bold">Santri Aktif</div>
+                    </div>
+                     <div class="anim-fade-up anim-hidden delay-200">
+                        <div class="text-4xl md:text-6xl font-bold text-secondary mb-2 font-serif counter" data-target="85">0</div>
+                        <div class="text-xs md:text-sm uppercase tracking-widest opacity-80 font-bold">Prestasi Nasional</div>
+                    </div>
+                     <div class="anim-fade-up anim-hidden delay-300">
+                        <div class="text-4xl md:text-6xl font-bold text-secondary mb-2 font-serif counter" data-target="100">0</div>
+                        <div class="text-xs md:text-sm uppercase tracking-widest opacity-80 font-bold">Target Hafalan %</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sambutan -->
+        <section class="py-20 bg-white relative">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
+                <div class="w-full md:w-1/3 relative anim-fade-left anim-hidden">
+                    <div class="absolute -top-4 -left-4 w-full h-full border-2 border-secondary rounded-2xl z-0"></div>
+                    <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl max-w-[280px] md:max-w-sm mx-auto">
+                        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=800" alt="Kepala Madrasah" class="w-full h-auto object-cover transform hover:scale-105 transition duration-700" loading="lazy">
+                    </div>
+                </div>
+                <div class="w-full md:w-2/3 anim-fade-right anim-hidden text-center md:text-left">
+                    <h4 class="text-secondary font-bold uppercase tracking-widest mb-2">Ahlan Wa Sahlan</h4>
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-dark mb-6">Sambutan Kepala Madrasah</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed text-base md:text-lg">"Selamat datang di website resmi MTs MQ Putri Tebuireng. Kami berkomitmen menyelenggarakan pendidikan yang integratif, memadukan kurikulum nasional dan kepesantrenan untuk melahirkan generasi wanita yang tangguh, cerdas, dan hafidzah."</p>
+                    <button onclick="switchPage('profil')" class="text-primary font-bold hover:translate-x-2 transition inline-flex items-center gap-2">Baca Selengkapnya <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MPL Highlights -->
+        <section id="mpl" class="py-20 bg-accent">
+            <div class="max-w-7xl mx-auto px-4 text-center mb-12 anim-zoom-in anim-hidden">
+                <h2 class="text-3xl md:text-4xl font-bold font-serif text-primary">Program MPL</h2>
+                <p class="text-gray-500">Membuka Pintu Langit</p>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:-translate-y-2 transition duration-300 anim-flip-up anim-hidden delay-100">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-primary text-xl mb-4 mx-auto"><i class="fas fa-sun"></i></div>
+                    <h3 class="font-bold text-center text-dark text-sm md:text-base">Harian</h3>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:-translate-y-2 transition duration-300 anim-flip-up anim-hidden delay-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xl mb-4 mx-auto"><i class="fas fa-calendar-week"></i></div>
+                    <h3 class="font-bold text-center text-dark text-sm md:text-base">Mingguan</h3>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:-translate-y-2 transition duration-300 anim-flip-up anim-hidden delay-300">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-xl mb-4 mx-auto"><i class="fas fa-moon"></i></div>
+                    <h3 class="font-bold text-center text-dark text-sm md:text-base">Bulanan</h3>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:-translate-y-2 transition duration-300 anim-flip-up anim-hidden delay-400">
+                    <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 text-xl mb-4 mx-auto"><i class="fas fa-award"></i></div>
+                    <h3 class="font-bold text-center text-dark text-sm md:text-base">Semester</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- BERANDA RAME (NEW SECTIONS) -->
+        
+        <!-- Sekilas Ekstrakurikuler -->
+        <section class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-end mb-8 anim-fade-up anim-hidden">
+                    <div>
+                        <h2 class="text-3xl font-bold font-serif text-primary">Minat & Bakat</h2>
+                        <p class="text-gray-500">Ekstrakurikuler Pilihan Santri</p>
+                    </div>
+                    <button onclick="switchPage('extra')" class="text-secondary font-bold hover:underline">Lihat Semua <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="switchPage('extra')" class="group cursor-pointer bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition anim-rotate-in anim-hidden">
+                        <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=400" class="w-full h-40 object-cover group-hover:scale-110 transition duration-500">
+                        <div class="p-4">
+                            <h4 class="font-bold text-dark">Pramuka Santri</h4>
+                        </div>
+                    </div>
+                    <div onclick="switchPage('extra')" class="group cursor-pointer bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition anim-rotate-in anim-hidden delay-100">
+                        <img src="https://images.unsplash.com/photo-1629814696096-7649547d21c9?q=80&w=400" class="w-full h-40 object-cover group-hover:scale-110 transition duration-500">
+                        <div class="p-4">
+                            <h4 class="font-bold text-dark">Kaligrafi</h4>
+                        </div>
+                    </div>
+                    <div onclick="switchPage('extra')" class="group cursor-pointer bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition anim-rotate-in anim-hidden delay-200">
+                        <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=400" class="w-full h-40 object-cover group-hover:scale-110 transition duration-500">
+                        <div class="p-4">
+                            <h4 class="font-bold text-dark">Karya Ilmiah (KIR)</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Galeri Mini di Beranda -->
+        <section class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="text-center mb-10 anim-zoom-in anim-hidden">
+                    <h2 class="text-3xl font-bold font-serif text-primary">Galeri Terkini</h2>
+                    <div class="w-16 h-1 bg-secondary mx-auto mt-2 rounded-full"></div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 h-60 md:h-80 anim-fade-up anim-hidden">
+                    <div class="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group cursor-pointer" onclick="switchPage('galeri')">
+                        <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute bottom-4 left-4 text-white font-bold text-lg drop-shadow-md">Kegiatan Santri</div>
+                    </div>
+                    <div class="rounded-2xl overflow-hidden group cursor-pointer" onclick="switchPage('galeri')">
+                        <img src="https://images.unsplash.com/photo-1621252179027-94459d27d3ee?q=80&w=400" class="w-full h-full object-cover group-hover:scale-110 transition">
+                    </div>
+                    <div class="rounded-2xl overflow-hidden group cursor-pointer" onclick="switchPage('galeri')">
+                        <img src="https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=400" class="w-full h-full object-cover group-hover:scale-110 transition">
+                    </div>
+                </div>
+                <div class="text-center mt-8">
+                    <button onclick="switchPage('galeri')" class="border border-primary text-primary px-6 py-2 rounded-full font-bold hover:bg-primary hover:text-white transition">Lihat Selengkapnya</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Berita Terkini di Beranda -->
+        <section class="py-20 bg-white">
+             <div class="max-w-7xl mx-auto px-4">
+                <div class="text-center mb-12 anim-fade-up anim-hidden">
+                    <h2 class="text-3xl font-bold text-primary font-serif">Kabar Pesantren</h2>
+                    <p class="text-gray-500">Informasi terbaru seputar kegiatan dan prestasi.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                     <div class="group cursor-pointer anim-fade-up anim-hidden" onclick="switchPage('news')">
+                        <div class="h-48 rounded-xl overflow-hidden mb-4 relative shadow-md">
+                            <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                            <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-bold text-primary">Prestasi</div>
+                        </div>
+                        <h3 class="font-bold text-lg leading-snug group-hover:text-primary transition">Juara 1 MTQ Tingkat Nasional</h3>
+                        <p class="text-sm text-gray-500 mt-2">12 Desember 2024</p>
+                     </div>
+                     <div class="group cursor-pointer anim-fade-up anim-hidden delay-100" onclick="switchPage('news')">
+                        <div class="h-48 rounded-xl overflow-hidden mb-4 relative shadow-md">
+                            <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                            <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-bold text-blue-600">Kegiatan</div>
+                        </div>
+                        <h3 class="font-bold text-lg leading-snug group-hover:text-primary transition">Kemah Bakti Santri 2024</h3>
+                        <p class="text-sm text-gray-500 mt-2">10 Desember 2024</p>
+                     </div>
+                     <div class="group cursor-pointer anim-fade-up anim-hidden delay-200" onclick="switchPage('news')">
+                        <div class="h-48 rounded-xl overflow-hidden mb-4 relative shadow-md">
+                            <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                            <div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-bold text-yellow-600">Akademik</div>
+                        </div>
+                        <h3 class="font-bold text-lg leading-snug group-hover:text-primary transition">Ujian Syafahi Semester Ganjil</h3>
+                        <p class="text-sm text-gray-500 mt-2">05 Desember 2024</p>
+                     </div>
+                </div>
+             </div>
+        </section>
+        
+         <!-- CTA PPDB -->
+        <section id="ppdb" class="py-24 bg-primary relative overflow-hidden">
+             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+             <div class="max-w-4xl mx-auto px-4 text-center relative z-10 anim-zoom-in anim-hidden">
+                 <h2 class="text-3xl md:text-5xl font-bold text-white font-serif mb-6">Bergabunglah Menjadi Keluarga MQ</h2>
+                 <p class="text-green-100 text-base md:text-lg mb-8">Pendaftaran Tahun Ajaran Baru Telah Dibuka. Segera daftarkan putri Anda.</p>
+                 <button class="bg-secondary text-white py-4 px-10 rounded-full font-bold shadow-2xl hover:bg-yellow-500 hover:scale-105 transition-all animate-bounce">Daftar PPDB Online</button>
+             </div>
+        </section>
+    </main>
+
+    <!-- =========================================
+         PAGE: PROFIL SEKOLAH (COMPLETE)
+    ========================================== -->
+    <main id="page-profil" class="page-section pt-24 pb-12 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 anim-fade-up anim-hidden">
+                <h2 class="text-4xl md:text-5xl font-bold text-primary font-serif mb-4">Profil Sekolah</h2>
+                <p class="text-gray-500 max-w-2xl mx-auto">Mengenal lebih dekat sejarah, visi, dan fasilitas MTs MQ Tebuireng Putri.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-12">
+                    
+                    <!-- Sejarah Block -->
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 anim-fade-right anim-hidden">
+                        <h3 class="text-2xl font-bold text-dark mb-6 flex items-center gap-3">
+                            <i class="fas fa-history text-secondary"></i> Sejarah Singkat
+                        </h3>
+                        <p class="text-gray-600 leading-relaxed mb-6 text-justify">
+                            MTs Madrasatul Qur'an Tebuireng Putri didirikan sebagai respons atas kebutuhan masyarakat akan lembaga pendidikan yang tidak hanya unggul dalam tahfidz Al-Qur'an, tetapi juga mumpuni dalam ilmu pengetahuan umum. Berdiri di tanah penuh berkah Tebuireng, madrasah ini terus berkembang menjadi pusat peradaban santri putri. Diawali dari majelis taklim sederhana, kini telah menjelma menjadi lembaga pendidikan formal modern yang tetap memegang teguh tradisi salaf.
+                        </p>
+                        <div class="space-y-0">
+                            <div class="timeline-item">
+                                <h4 class="font-bold text-dark">1990 - Pendirian</h4>
+                                <p class="text-sm text-gray-500">Peletakan batu pertama oleh KH. Yusuf Hasyim, menandai awal mula perjuangan.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4 class="font-bold text-dark">2005 - Pengembangan Asrama</h4>
+                                <p class="text-sm text-gray-500">Pembangunan gedung asrama putri terpadu untuk menampung santri dari luar daerah.</p>
+                            </div>
+                            <div class="timeline-item border-l-0">
+                                <h4 class="font-bold text-dark">2020 - Digitalisasi</h4>
+                                <p class="text-sm text-gray-500">Penerapan sistem pembelajaran berbasis digital smart classroom dan e-library.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visi Misi Block -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 anim-fade-up anim-hidden delay-100">
+                        <div class="bg-green-50 p-8 rounded-2xl border border-green-100">
+                            <h3 class="text-xl font-bold text-primary mb-4">Visi</h3>
+                            <p class="text-gray-700 font-medium italic">"Terwujudnya Generasi Qur'ani yang Berprestasi, Berbudaya, dan Berwawasan Lingkungan."</p>
+                        </div>
+                        <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                            <h3 class="text-xl font-bold text-dark mb-4">Misi Utama</h3>
+                            <ul class="space-y-3 text-sm text-gray-600">
+                                <li class="flex gap-2"><i class="fas fa-check-circle text-secondary mt-1"></i> Menyelenggarakan tahfidz Al-Qur'an intensif.</li>
+                                <li class="flex gap-2"><i class="fas fa-check-circle text-secondary mt-1"></i> Mengembangkan pembelajaran sains & teknologi.</li>
+                                <li class="flex gap-2"><i class="fas fa-check-circle text-secondary mt-1"></i> Membiasakan akhlakul karimah dan kemandirian.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Fasilitas Gallery Grid -->
+                    <div class="anim-fade-up anim-hidden delay-200">
+                        <h3 class="text-2xl font-bold text-dark mb-6">Fasilitas Penunjang</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="h-32 rounded-xl bg-gray-200 overflow-hidden relative group">
+                                <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                    <span class="text-white text-xs font-bold">Lab Komputer</span>
+                                </div>
+                            </div>
+                            <div class="h-32 rounded-xl bg-gray-200 overflow-hidden relative group">
+                                <img src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                    <span class="text-white text-xs font-bold">Perpus Digital</span>
+                                </div>
+                            </div>
+                            <div class="h-32 rounded-xl bg-gray-200 overflow-hidden relative group">
+                                <img src="https://images.unsplash.com/photo-1595123550441-d377e017de2a?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                    <span class="text-white text-xs font-bold">Masjid</span>
+                                </div>
+                            </div>
+                             <div class="h-32 rounded-xl bg-gray-200 overflow-hidden relative group">
+                                <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                    <span class="text-white text-xs font-bold">Lapangan Olahraga</span>
+                                </div>
+                            </div>
+                             <div class="h-32 rounded-xl bg-gray-200 overflow-hidden relative group">
+                                <img src="https://images.unsplash.com/photo-1629814696096-7649547d21c9?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                    <span class="text-white text-xs font-bold">Asrama Putri</span>
+                                </div>
+                            </div>
+                             <div class="h-32 rounded-xl bg-gray-200 overflow-hidden relative group">
+                                <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                    <span class="text-white text-xs font-bold">Kantin Sehat</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Struktur -->
+                <div class="lg:col-span-1 anim-fade-left anim-hidden delay-300">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-28">
+                        <h3 class="text-xl font-bold text-dark mb-6">Struktur Pimpinan</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center gap-4">
+                                <img src="https://ui-avatars.com/api/?name=Fulan&background=047857&color=fff" class="w-12 h-12 rounded-full" loading="lazy">
+                                <div>
+                                    <h5 class="font-bold text-sm text-dark">KH. Fulan bin Fulan</h5>
+                                    <p class="text-xs text-gray-500">Pengasuh</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <img src="https://ui-avatars.com/api/?name=Siti&background=F59E0B&color=fff" class="w-12 h-12 rounded-full" loading="lazy">
+                                <div>
+                                    <h5 class="font-bold text-sm text-dark">Hj. Siti Fulanah, M.Pd</h5>
+                                    <p class="text-xs text-gray-500">Kepala Madrasah</p>
+                                </div>
+                            </div>
+                             <div class="flex items-center gap-4">
+                                <img src="https://ui-avatars.com/api/?name=Ahmad&background=random" class="w-12 h-12 rounded-full" loading="lazy">
+                                <div>
+                                    <h5 class="font-bold text-sm text-dark">Ust. Ahmad S.Pd.I</h5>
+                                    <p class="text-xs text-gray-500">Waka Kurikulum</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8 pt-6 border-t border-gray-100">
+                            <button class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm hover:bg-gray-100 transition text-dark font-medium">
+                                <span>Download Profil.pdf</span>
+                                <i class="fas fa-download text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- =========================================
+         PAGE: EKSTRAKURIKULER (AESTHETIC UPGRADE)
+    ========================================== -->
+    <main id="page-extra" class="page-section pt-24 pb-12 min-h-screen">
+         <div class="max-w-7xl mx-auto px-4">
+             <div class="text-center mb-16 anim-fade-up anim-hidden">
+                <span class="text-secondary font-bold tracking-widest uppercase text-sm mb-2 block">Pengembangan Diri</span>
+                <h2 class="text-4xl font-bold text-primary font-serif mb-4">Ekstrakurikuler Pilihan</h2>
+                <p class="text-gray-500">Wadah kreativitas dan sportivitas santriwati MQ Tebuireng.</p>
+             </div>
+             
+             <!-- Filter (Visual only for prototype) -->
+             <div class="flex flex-wrap justify-center gap-4 mb-12 anim-fade-up anim-hidden delay-100">
+                 <button class="px-6 py-2 rounded-full bg-primary text-white text-sm font-bold shadow-lg hover:bg-primaryDark transition">Semua</button>
+                 <button class="px-6 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-bold hover:border-primary hover:text-primary transition">Keagamaan</button>
+                 <button class="px-6 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-bold hover:border-primary hover:text-primary transition">Seni & Budaya</button>
+                 <button class="px-6 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-bold hover:border-primary hover:text-primary transition">Olahraga</button>
+                 <button class="px-6 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-bold hover:border-primary hover:text-primary transition">Akademik</button>
+             </div>
+
+             <!-- Aesthetic Grid -->
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 
+                 <!-- Extra Card 1 -->
+                 <div onclick="openExtraDetail('Pramuka', 'Gerakan kepanduan yang melatih kedisiplinan, kemandirian, dan cinta alam. Kegiatan meliputi kemah, tali temali, dan sandi.', 'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=600')" class="group relative h-80 rounded-3xl overflow-hidden cursor-pointer shadow-xl anim-rotate-in anim-hidden">
+                     <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=600" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                     <div class="absolute inset-0 extra-card-overlay flex flex-col justify-end p-8">
+                         <span class="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-3">Wajib</span>
+                         <h3 class="text-white text-2xl font-bold mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">Pramuka Santri</h3>
+                         <p class="text-gray-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">Membentuk karakter mandiri dan tangguh.</p>
+                     </div>
+                 </div>
+
+                 <!-- Extra Card 2 -->
+                 <div onclick="openExtraDetail('Kaligrafi', 'Seni menulis indah ayat-ayat suci Al-Qur\'an dengan berbagai khat seperti Naskhi, Tsuluts, dan Diwani.', 'https://images.unsplash.com/photo-1629814696096-7649547d21c9?q=80&w=600')" class="group relative h-80 rounded-3xl overflow-hidden cursor-pointer shadow-xl anim-rotate-in anim-hidden delay-100">
+                     <img src="https://images.unsplash.com/photo-1629814696096-7649547d21c9?q=80&w=600" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                     <div class="absolute inset-0 extra-card-overlay flex flex-col justify-end p-8">
+                         <span class="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-3">Seni</span>
+                         <h3 class="text-white text-2xl font-bold mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">Seni Kaligrafi</h3>
+                         <p class="text-gray-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">Keindahan goresan pena cinta Al-Qur'an.</p>
+                     </div>
+                 </div>
+
+                 <!-- Extra Card 3 -->
+                 <div onclick="openExtraDetail('KIR', 'Wadah bagi santri yang gemar meneliti dan berinovasi dalam bidang sains maupun sosial humaniora.', 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=600')" class="group relative h-80 rounded-3xl overflow-hidden cursor-pointer shadow-xl anim-rotate-in anim-hidden delay-200">
+                     <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=600" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                     <div class="absolute inset-0 extra-card-overlay flex flex-col justify-end p-8">
+                         <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-3">Akademik</span>
+                         <h3 class="text-white text-2xl font-bold mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">Karya Ilmiah (KIR)</h3>
+                         <p class="text-gray-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">Peneliti muda berwawasan global.</p>
+                     </div>
+                 </div>
+
+                 <!-- Extra Card 4 -->
+                 <div onclick="openExtraDetail('Hadrah', 'Melantunkan sholawat dengan iringan alat musik rebana ala Banjari untuk menumbuhkan cinta Rasul.', 'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=600')" class="group relative h-80 rounded-3xl overflow-hidden cursor-pointer shadow-xl anim-rotate-in anim-hidden delay-300">
+                     <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=600" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                     <div class="absolute inset-0 extra-card-overlay flex flex-col justify-end p-8">
+                         <span class="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-3">Keagamaan</span>
+                         <h3 class="text-white text-2xl font-bold mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">Hadrah Al-Banjari</h3>
+                         <p class="text-gray-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">Senandung rindu untuk Nabi.</p>
+                     </div>
+                 </div>
+
+                 <!-- Extra Card 5 -->
+                 <div onclick="openExtraDetail('Jurnalistik', 'Melatih kemampuan menulis, fotografi, dan reportase kegiatan pondok untuk majalah dinding dan website.', 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=600')" class="group relative h-80 rounded-3xl overflow-hidden cursor-pointer shadow-xl anim-rotate-in anim-hidden delay-100">
+                     <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=600" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                     <div class="absolute inset-0 extra-card-overlay flex flex-col justify-end p-8">
+                         <span class="bg-pink-600 text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-3">Literasi</span>
+                         <h3 class="text-white text-2xl font-bold mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">Jurnalistik Santri</h3>
+                         <p class="text-gray-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">Menyuarakan inspirasi lewat pena.</p>
+                     </div>
+                 </div>
+
+                 <!-- Extra Card 6 -->
+                 <div onclick="openExtraDetail('Public Speaking', 'Pelatihan pidato 3 bahasa (Arab, Inggris, Indonesia) untuk mencetak da\'iyah masa depan.', 'https://images.unsplash.com/photo-1475721027767-4d529c14e569?q=80&w=600')" class="group relative h-80 rounded-3xl overflow-hidden cursor-pointer shadow-xl anim-rotate-in anim-hidden delay-200">
+                     <img src="https://images.unsplash.com/photo-1475721027767-4d529c14e569?q=80&w=600" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                     <div class="absolute inset-0 extra-card-overlay flex flex-col justify-end p-8">
+                         <span class="bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold w-fit mb-3">Bahasa</span>
+                         <h3 class="text-white text-2xl font-bold mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">Public Speaking</h3>
+                         <p class="text-gray-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">Berani tampil, cakap bicara.</p>
+                     </div>
+                 </div>
+
+             </div>
+         </div>
+    </main>
+
+    <!-- =========================================
+         PAGE: PRESTASI (HALL OF FAME)
+    ========================================== -->
+    <main id="page-prestasi" class="page-section pt-24 pb-12 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16 anim-fade-up anim-hidden">
+                <h2 class="text-4xl font-bold text-primary font-serif mb-4">Hall of Fame</h2>
+                <p class="text-gray-500">Jejak prestasi santriwati mengharumkan nama madrasah di kancah nasional.</p>
+            </div>
+            
+            <div class="space-y-8">
+                <!-- Prestasi Item 1 (Gold) -->
+                <div class="flex flex-col md:flex-row gap-6 bg-gradient-to-r from-white to-yellow-50 p-6 rounded-2xl shadow-md border-l-8 border-yellow-400 hover:shadow-xl transition anim-fade-left anim-hidden">
+                    <div class="w-full md:w-1/4">
+                        <div class="h-48 rounded-xl overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1566808990106-03b5113d5271?q=80&w=600" class="w-full h-full object-cover transform hover:scale-110 transition duration-500" loading="lazy">
+                            <div class="absolute top-2 left-2 bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded shadow"><i class="fas fa-medal"></i> Juara 1</div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-3/4 flex flex-col justify-center">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-2xl font-bold text-dark font-serif">Lomba Pidato Bahasa Arab Nasional (POSPENAS)</h3>
+                            <span class="bg-white border border-gray-200 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">2024</span>
+                        </div>
+                        <p class="text-gray-600 mb-6 text-lg">"Keberhasilan ini adalah buah dari ketekunan dan doa orang tua."</p>
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg w-fit shadow-sm">
+                            <img src="https://ui-avatars.com/api/?name=Fatimah&background=random" class="w-10 h-10 rounded-full" loading="lazy">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">Fatimah Az-Zahra</p>
+                                <p class="text-xs text-gray-500">Kelas 9A</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Prestasi Item 2 (Silver) -->
+                <div class="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-2xl shadow-sm border-l-8 border-gray-300 hover:shadow-xl transition anim-fade-right anim-hidden delay-100">
+                    <div class="w-full md:w-1/4">
+                        <div class="h-48 rounded-xl overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1606092195730-5d7b9af1ef4d?q=80&w=600" class="w-full h-full object-cover transform hover:scale-110 transition duration-500" loading="lazy">
+                            <div class="absolute top-2 left-2 bg-gray-400 text-white text-xs font-bold px-2 py-1 rounded shadow"><i class="fas fa-medal"></i> Medali Emas</div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-3/4 flex flex-col justify-center">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-2xl font-bold text-dark font-serif">Olimpiade Sains Madrasah (Biologi)</h3>
+                            <span class="bg-white border border-gray-200 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">2023</span>
+                        </div>
+                        <p class="text-gray-600 mb-6 text-lg">Membuktikan santri tidak hanya pandai mengaji, tapi juga menguasai sains.</p>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg w-fit shadow-sm">
+                            <img src="https://ui-avatars.com/api/?name=Aisyah&background=random" class="w-10 h-10 rounded-full" loading="lazy">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">Aisyah Humaira</p>
+                                <p class="text-xs text-gray-500">Kelas 8C</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prestasi Item 3 (Bronze/General) -->
+                <div class="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-2xl shadow-sm border-l-8 border-orange-400 hover:shadow-xl transition anim-fade-left anim-hidden delay-200">
+                    <div class="w-full md:w-1/4">
+                        <div class="h-48 rounded-xl overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=600" class="w-full h-full object-cover transform hover:scale-110 transition duration-500" loading="lazy">
+                            <div class="absolute top-2 left-2 bg-orange-400 text-white text-xs font-bold px-2 py-1 rounded shadow"><i class="fas fa-medal"></i> Juara Harapan 1</div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-3/4 flex flex-col justify-center">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-2xl font-bold text-dark font-serif">Festival Seni Islami Nasional</h3>
+                            <span class="bg-white border border-gray-200 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">2023</span>
+                        </div>
+                        <p class="text-gray-600 mb-6 text-lg">Tim Hadrah MQ Putri memukau juri dengan aransemen sholawat kontemporer.</p>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg w-fit shadow-sm">
+                            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">TIM</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">Tim Hadrah Al-Banjari</p>
+                                <p class="text-xs text-gray-500">Ekskul Seni</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- =========================================
+         PAGE: GALERI (MASONRY COMPLETED)
+    ========================================== -->
+    <main id="page-galeri" class="page-section pt-24 pb-12 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold text-primary mb-4 font-serif">Galeri Foto & Video</h2>
+            <p class="text-gray-500 mb-12">Momen-momen berharga dalam keseharian santri.</p>
+            
+            <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6 text-left">
+                <!-- Foto 1 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden shadow-lg group relative cursor-pointer anim-zoom-in anim-hidden">
+                    <img src="https://images.unsplash.com/photo-1621252179027-94459d27d3ee?q=80&w=600" class="w-full hover:scale-110 transition duration-700" loading="lazy">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold">Kegiatan Belajar</div>
+                </div>
+                <!-- Foto 2 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden shadow-lg group relative cursor-pointer anim-zoom-in anim-hidden delay-100">
+                    <img src="https://images.unsplash.com/photo-1596495577886-d920f1fb7238?q=80&w=600" class="w-full hover:scale-110 transition duration-700" loading="lazy">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold">Upacara Bendera</div>
+                </div>
+                <!-- Foto 3 (Tall) -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden shadow-lg group relative cursor-pointer anim-zoom-in anim-hidden delay-200">
+                    <img src="https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=600" class="w-full hover:scale-110 transition duration-700" loading="lazy">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold">Wisuda Tahfidz</div>
+                </div>
+                <!-- Foto 4 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden shadow-lg group relative cursor-pointer anim-zoom-in anim-hidden delay-300">
+                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=600" class="w-full hover:scale-110 transition duration-700" loading="lazy">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold">Kunjungan Ulama</div>
+                </div>
+                <!-- Foto 5 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden shadow-lg group relative cursor-pointer anim-zoom-in anim-hidden delay-100">
+                    <img src="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?q=80&w=600" class="w-full hover:scale-110 transition duration-700" loading="lazy">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold">Masjid Pesantren</div>
+                </div>
+                 <!-- Foto 6 -->
+                <div class="break-inside-avoid rounded-2xl overflow-hidden shadow-lg group relative cursor-pointer anim-zoom-in anim-hidden delay-200">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600" class="w-full hover:scale-110 transition duration-700" loading="lazy">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold">Praktik Ibadah</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- =========================================
+         PAGE: ALUMNI (COMPLETE)
+    ========================================== -->
+    <main id="page-alumni" class="page-section pt-24 pb-12 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4">
+             <div class="text-center mb-16 anim-fade-up anim-hidden">
+                <h2 class="text-4xl font-bold text-primary font-serif mb-4">Jejak Alumni</h2>
+                <p class="text-gray-500">Kiprah para alumni di berbagai bidang pengabdian.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Alumni 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition text-center anim-flip-up anim-hidden border border-gray-100">
+                    <img src="https://ui-avatars.com/api/?name=Zahra&size=128" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-accent shadow-md" loading="lazy">
+                    <h3 class="font-bold text-xl text-dark">Ning Zahra</h3>
+                    <p class="text-sm text-primary font-bold mb-4">Angkatan 2015 - Hafidzah 30 Juz</p>
+                    <p class="text-gray-600 italic text-sm leading-relaxed">"MTs MQ memberikan pondasi agama yang kuat tanpa meninggalkan wawasan akademis. Barokah Al-Quran terasa di setiap langkah studi saya."</p>
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Karir</p>
+                        <p class="text-sm font-bold text-dark">Mahasiswi Al-Azhar Kairo</p>
+                    </div>
+                </div>
+                 <!-- Alumni 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition text-center anim-flip-up anim-hidden delay-100 border border-gray-100">
+                    <img src="https://ui-avatars.com/api/?name=Nurul&size=128" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-accent shadow-md" loading="lazy">
+                    <h3 class="font-bold text-xl text-dark">Dr. Nurul Hidayah</h3>
+                    <p class="text-sm text-primary font-bold mb-4">Angkatan 2008 - Dokter</p>
+                    <p class="text-gray-600 italic text-sm leading-relaxed">"Disiplin yang diajarkan di asrama membentuk mental saya menjadi tangguh dalam menghadapi dunia perkuliahan kedokteran."</p>
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Karir</p>
+                        <p class="text-sm font-bold text-dark">Dokter RSUD Jombang</p>
+                    </div>
+                </div>
+                <!-- Alumni 3 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition text-center anim-flip-up anim-hidden delay-200 border border-gray-100">
+                    <img src="https://ui-avatars.com/api/?name=Hani&size=128" class="w-24 h-24 rounded-full mx-auto mb-6 border-4 border-accent shadow-md" loading="lazy">
+                    <h3 class="font-bold text-xl text-dark">Hani'ah, S.Pd</h3>
+                    <p class="text-sm text-primary font-bold mb-4">Angkatan 2012 - Guru</p>
+                    <p class="text-gray-600 italic text-sm leading-relaxed">"Lingkungan yang asri dan mendukung untuk menghafal Quran adalah kenangan terbaik saya di MQ."</p>
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Karir</p>
+                        <p class="text-sm font-bold text-dark">Guru PNS</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 bg-gradient-to-r from-primary to-primaryDark rounded-2xl p-12 text-center text-white anim-zoom-in anim-hidden relative overflow-hidden">
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                <h3 class="text-3xl font-bold mb-4 font-serif relative z-10">Anda Alumni MQ Putri?</h3>
+                <p class="mb-8 text-green-100 relative z-10">Mari bergabung dalam ikatan alumni untuk mempererat silaturahmi dan berbagi informasi.</p>
+                <button class="bg-white text-primary px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition shadow-lg relative z-10">Update Data Alumni</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- =========================================
+         PAGE: NEWS & INFO (COMPLETE BLOG LAYOUT)
+    ========================================== -->
+    <main id="page-news" class="page-section pt-24 pb-12 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 anim-fade-up anim-hidden">
+                <h2 class="text-4xl font-bold text-primary font-serif mb-4">Berita & Artikel</h2>
+                <p class="text-gray-500">Update terbaru seputar kegiatan pondok dan wawasan keislaman.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-10">
+                    <!-- Article 1 -->
+                    <article class="flex flex-col md:flex-row gap-6 group cursor-pointer anim-fade-up anim-hidden">
+                        <div class="w-full md:w-2/5 h-56 rounded-2xl overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                        </div>
+                        <div class="w-full md:w-3/5">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="bg-green-100 text-primary px-2 py-1 rounded text-xs font-bold">PRESTASI</span>
+                                <span class="text-gray-400 text-xs">12 Des 2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-dark mb-3 group-hover:text-primary transition line-clamp-2">Juara 1 MTQ Tingkat Nasional, Santri MQ Harumkan Nama Jawa Timur</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">Alhamdulillah, berkat doa dan bimbingan para asatidz, ananda Fatimah Az-Zahra berhasil meraih juara pertama...</p>
+                            <span class="text-primary text-sm font-bold border-b border-primary pb-0.5">Baca Selengkapnya</span>
+                        </div>
+                    </article>
+
+                    <!-- Article 2 -->
+                    <article class="flex flex-col md:flex-row gap-6 group cursor-pointer anim-fade-up anim-hidden delay-100">
+                        <div class="w-full md:w-2/5 h-56 rounded-2xl overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                        </div>
+                        <div class="w-full md:w-3/5">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-bold">KEGIATAN</span>
+                                <span class="text-gray-400 text-xs">10 Des 2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-dark mb-3 group-hover:text-primary transition line-clamp-2">Kemah Bakti Santri 2024: Membangun Jiwa Korsa dan Kemandirian</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">Kegiatan tahunan ini dilaksanakan di Bumi Perkemahan Wonosalam dengan diikuti oleh seluruh santri kelas 7 dan 8...</p>
+                            <span class="text-primary text-sm font-bold border-b border-primary pb-0.5">Baca Selengkapnya</span>
+                        </div>
+                    </article>
+
+                    <!-- Article 3 -->
+                    <article class="flex flex-col md:flex-row gap-6 group cursor-pointer anim-fade-up anim-hidden delay-200">
+                        <div class="w-full md:w-2/5 h-56 rounded-2xl overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+                        </div>
+                        <div class="w-full md:w-3/5">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="bg-yellow-100 text-yellow-600 px-2 py-1 rounded text-xs font-bold">AKADEMIK</span>
+                                <span class="text-gray-400 text-xs">05 Des 2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-dark mb-3 group-hover:text-primary transition line-clamp-2">Jadwal Ujian Syafahi dan Tahriri Semester Ganjil 2024/2025</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">Berikut adalah jadwal lengkap pelaksanaan ujian akhir semester ganjil yang akan dimulai pekan depan...</p>
+                            <span class="text-primary text-sm font-bold border-b border-primary pb-0.5">Baca Selengkapnya</span>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="lg:col-span-1 space-y-8 anim-fade-left anim-hidden delay-200">
+                    <!-- Search -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <input type="text" placeholder="Cari berita..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h4 class="font-bold text-lg mb-4 text-dark border-l-4 border-primary pl-3">Kategori</h4>
+                        <ul class="space-y-3">
+                            <li class="flex justify-between items-center text-gray-600 hover:text-primary cursor-pointer"><span>Berita Sekolah</span> <span class="bg-gray-100 px-2 py-0.5 rounded text-xs">12</span></li>
+                            <li class="flex justify-between items-center text-gray-600 hover:text-primary cursor-pointer"><span>Prestasi</span> <span class="bg-gray-100 px-2 py-0.5 rounded text-xs">8</span></li>
+                            <li class="flex justify-between items-center text-gray-600 hover:text-primary cursor-pointer"><span>Artikel Islami</span> <span class="bg-gray-100 px-2 py-0.5 rounded text-xs">24</span></li>
+                            <li class="flex justify-between items-center text-gray-600 hover:text-primary cursor-pointer"><span>Agenda</span> <span class="bg-gray-100 px-2 py-0.5 rounded text-xs">5</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h4 class="font-bold text-lg mb-4 text-dark border-l-4 border-primary pl-3">Tag Populer</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs hover:bg-primary hover:text-white cursor-pointer transition">#Tahfidz</span>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs hover:bg-primary hover:text-white cursor-pointer transition">#Pramuka</span>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs hover:bg-primary hover:text-white cursor-pointer transition">#Juara</span>
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs hover:bg-primary hover:text-white cursor-pointer transition">#Santri</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-16 md:pt-20 pb-10 border-t border-gray-800 font-sans">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-16">
+                <!-- Kolom 1 -->
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-bold text-xl font-serif">MQ</div>
+                        <span class="font-bold text-lg">MTs MQ Putri</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">Lembaga pendidikan Islam yang mengintegrasikan kurikulum pesantren dan nasional untuk mencetak generasi Qur'ani yang intelek.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary hover:text-white transition"><i class="fab fa-facebook-f text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-pink-600 hover:text-white transition"><i class="fab fa-instagram text-sm"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-600 hover:text-white transition"><i class="fab fa-youtube text-sm"></i></a>
+                    </div>
+                </div>
+                <!-- Kolom 2 -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Tautan Cepat</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><a href="#" onclick="switchPage('profil')" class="hover:text-secondary transition">Profil Sekolah</a></li>
+                        <li><a href="#" onclick="switchPage('extra')" class="hover:text-secondary transition">Ekstrakurikuler</a></li>
+                        <li><a href="#" onclick="switchPage('news')" class="hover:text-secondary transition">Pengumuman</a></li>
+                    </ul>
+                </div>
+                <!-- Kolom 3 -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Kontak</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li><i class="fas fa-map-marker-alt mr-2 text-secondary"></i> Jl. Irian Jaya No. 10, Tebuireng</li>
+                        <li><i class="fas fa-phone mr-2 text-secondary"></i> (0321) 861-234</li>
+                        <li><i class="fas fa-envelope mr-2 text-secondary"></i> admin@mtsmqputri.sch.id</li>
+                    </ul>
+                </div>
+                <!-- Kolom 4 -->
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Lokasi</h4>
+                    <div class="bg-gray-800 h-32 rounded-lg flex items-center justify-center text-gray-500 text-sm cursor-pointer hover:bg-gray-700 transition">
+                        <i class="fas fa-map-marker-alt mr-2"></i> Buka Peta
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-xs text-gray-500">
+                &copy; 2025 MTs MQ Tebuireng Putri. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // --- Page Switcher ---
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active-page'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            
+            const target = document.getElementById(`page-${pageId}`);
+            if(target) target.classList.add('active-page');
+            
+            const activeLink = document.querySelector(`.nav-link[data-target="${pageId}"]`);
+            if(activeLink) activeLink.classList.add('active');
+            
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function scrollToSection(sectionId) {
+            switchPage('home');
+            setTimeout(() => {
+                const element = document.getElementById(sectionId);
+                if(element) element.scrollIntoView({behavior: 'smooth'});
+            }, 100);
+        }
+
+        // --- Extra Detail Logic ---
+        function openExtraDetail(title, desc, img) {
+            switchPage('extra-detail');
+            document.getElementById('detail-title').innerText = title;
+            document.getElementById('detail-desc').innerText = desc;
+            document.getElementById('detail-img').src = img;
+        }
+
+        // --- Slider Logic ---
+        let currentSlide = 0;
+        const sliderContainer = document.getElementById('hero-slider');
+        function moveSlide(direction) {
+            const slides = document.querySelectorAll('.slide');
+            currentSlide += direction;
+            if (currentSlide >= slides.length) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = slides.length - 1;
+            sliderContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+        setInterval(() => moveSlide(1), 5000);
+
+        // --- Animations on Scroll ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    entry.target.classList.remove('anim-hidden');
+                    if(entry.target.classList.contains('counter') || entry.target.querySelector('.counter')) startCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.anim-fade-up, .anim-fade-left, .anim-fade-right, .anim-zoom-in, .anim-flip-up, .anim-rotate-in').forEach(el => {
+            el.classList.add('anim-hidden');
+            observer.observe(el);
+        });
+
+        // --- Counter Animation ---
+        let countersStarted = false;
+        function startCounters() {
+            if(countersStarted) return;
+            document.querySelectorAll('.counter').forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const duration = 2000;
+                const increment = target / (duration / 16);
+                let current = 0;
+                const update = () => {
+                    current += increment;
+                    if(current < target) {
+                        counter.innerText = Math.ceil(current);
+                        requestAnimationFrame(update);
+                    } else {
+                        counter.innerText = target;
+                        if(target <= 100) counter.innerText += "%";
+                    }
+                };
+                update();
+            });
+            countersStarted = true;
+        }
+
+        // Mobile Menu
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
