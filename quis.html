@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduScore AI - Intelligent Assessment Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <style>
+        :root {
+            --primary: #0459ae;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            overflow: hidden; 
+        }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        
+        /* Scrollbar Halus */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: '#0459ae', 50: '#f0f7ff', 100: '#e0effe', 500: '#3b82f6', 600: '#0459ae', 700: '#1e40af', 900: '#1e3a8a' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="text-slate-800 h-screen w-screen">
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="h-full w-full relative"></div>
+
+    <!-- FLOATING DEV MENU -->
+    <div class="fixed bottom-6 right-6 z-50 group">
+        <button class="bg-slate-900 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center justify-center">
+            <span class="material-symbols-rounded">build</span>
+        </button>
+        <div class="absolute bottom-full right-0 mb-4 w-48 bg-white rounded-xl shadow-xl p-2 hidden group-hover:block border border-slate-200 animate-fade-in origin-bottom-right">
+            <div class="text-xs font-bold text-slate-400 uppercase px-3 py-2">Quick Jump</div>
+            <button onclick="navigate('auth')" class="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded-lg flex items-center gap-2"><span class="material-symbols-rounded text-base">login</span> Auth Portal</button>
+            <button onclick="switchAuthRole('teacher'); navigate('teacher_dash')" class="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded-lg flex items-center gap-2"><span class="material-symbols-rounded text-base">dashboard</span> Teacher Dash</button>
+            <button onclick="switchAuthRole('student'); navigate('student_dash')" class="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded-lg flex items-center gap-2"><span class="material-symbols-rounded text-base">person</span> Student Dash</button>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed top-6 right-6 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- LOGIC -->
+    <script>
+        // --- 1. STATE & DATA ---
+        const appState = {
+            currentUserRole: 'teacher', // 'teacher' or 'student'
+            currentPage: 'auth',
+            timer: 3600,
+            timerInterval: null,
+            studentData: {
+                activeExams: [
+                    { id: 1, title: "Physics: Newton's Laws", subject: "Science", status: "In Progress", timeLeft: "45m", progress: 25 }
+                ],
+                upcomingExams: [
+                    { id: 2, title: "History: WWII Essay", subject: "History", dueDate: "Tomorrow", urgency: "High" },
+                    { id: 3, title: "Math: Linear Algebra", subject: "Math", dueDate: "In 2 days", urgency: "Medium" }
+                ],
+                completedExams: [
+                    { id: 101, title: "Calculus Quiz 1", score: 92, grade: "A", date: "Yesterday" },
+                    { id: 102, title: "English Lit Review", score: 85, grade: "B", date: "2 days ago" }
+                ]
+            }
+        };
+
+        // --- 2. NAVIGATION SYSTEM ---
+        function init() { navigate('auth'); }
+
+        function navigate(pageName) {
+            console.log(`Navigating to: ${pageName}`);
+            appState.currentPage = pageName;
+            
+            if (appState.timerInterval && pageName !== 'exam') clearInterval(appState.timerInterval);
+
+            const app = document.getElementById('app');
+            app.innerHTML = ''; 
+            
+            switch(pageName) {
+                case 'auth': renderAuth(app); break;
+                // Teacher
+                case 'teacher_dash': renderTeacherDash(app); break;
+                case 'my_classes': renderMyClasses(app); break; // Content Restored
+                case 'quiz_editor': renderQuizEditor(app); break; // Content Restored
+                case 'reports': renderReports(app); break; // Content Restored
+                // Student
+                case 'student_dash': renderStudentDash(app); break;
+                case 'exam': renderExam(app); break;
+                case 'leaderboard': renderLeaderboard(app); break;
+                // Shared
+                case 'settings': renderSettings(app); break;
+                case 'admin': renderAdmin(app); break;
+                default: renderAuth(app);
+            }
+        }
+
+        // --- 3. COMPONENTS ---
+
+        function getSidebarHTML(activePage) {
+            const isTeacher = appState.currentUserRole === 'teacher';
+            
+            const teacherMenu = [
+                { id: 'teacher_dash', icon: 'dashboard', label: 'Dashboard' },
+                { id: 'my_classes', icon: 'school', label: 'My Classes' },
+                { id: 'quiz_editor', icon: 'quiz', label: 'Quiz Editor' },
+                { id: 'reports', icon: 'analytics', label: 'Reports' },
+                { id: 'settings', icon: 'settings', label: 'Settings' } 
+            ];
+
+            const studentMenu = [
+                { id: 'student_dash', icon: 'dashboard', label: 'Dashboard' },
+                { id: 'leaderboard', icon: 'emoji_events', label: 'Leaderboard' }, 
+                { id: 'settings', icon: 'settings', label: 'Settings' }
+            ];
+
+            const menuItems = isTeacher ? teacherMenu : studentMenu;
+            const profileName = isTeacher ? "Mr. Anderson" : "Alex Student";
+            const profileRole = isTeacher ? "Teacher" : "Grade 11";
+
+            return `
+                <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden lg:flex shrink-0 z-20 h-full">
+                    <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+                        <div class="size-8 bg-brand-600 rounded-lg flex items-center justify-center text-white">
+                            <span class="material-symbols-rounded">school</span>
+                        </div>
+                        <div>
+                            <h1 class="font-bold font-display text-lg text-slate-800 leading-none">EduScore AI</h1>
+                            <span class="text-xs text-slate-500">${isTeacher ? 'Teacher Portal' : 'Student Hub'}</span>
+                        </div>
+                    </div>
+                    <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+                        ${menuItems.map(item => `
+                            <button onclick="navigate('${item.id}')" 
+                                class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                                    activePage === item.id 
+                                    ? 'bg-brand-50 text-brand-700 shadow-sm border border-brand-100' 
+                                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                }">
+                                <span class="material-symbols-rounded ${activePage === item.id ? 'fill-current' : ''}">${item.icon}</span>
+                                ${item.label}
+                            </button>
+                        `).join('')}
+                    </nav>
+                    <div class="p-4 border-t border-slate-100">
+                        <div class="flex items-center gap-3 px-2 mb-4">
+                            <img src="https://i.pravatar.cc/150?img=${isTeacher ? 11 : 5}" class="w-8 h-8 rounded-full border border-slate-200">
+                            <div>
+                                <p class="text-sm font-bold text-slate-700">${profileName}</p>
+                                <p class="text-xs text-slate-500">${profileRole}</p>
+                            </div>
+                        </div>
+                        <button onclick="navigate('auth')" class="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                            <span class="material-symbols-rounded text-lg">logout</span> Sign Out
+                        </button>
+                    </div>
+                </aside>
+            `;
+        }
+
+        // --- 4. PAGE RENDERERS ---
+
+        // AUTH
+        function renderAuth(container) {
+            container.innerHTML = `
+                <div class="flex h-full w-full">
+                    <div class="hidden lg:flex w-1/2 bg-brand-600 relative items-center justify-center text-white overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-brand-600 to-indigo-900 opacity-90"></div>
+                        <div class="z-10 p-12 max-w-lg relative">
+                            <h1 class="text-5xl font-display font-bold mb-6">Grade Smarter.</h1>
+                            <p class="text-brand-100 text-lg">Platform penilaian bertenaga AI untuk guru modern.</p>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/2 flex items-center justify-center bg-white p-8">
+                        <div class="w-full max-w-md animate-fade-in">
+                            <h2 class="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h2>
+                            <p class="text-slate-500 mb-8">Pilih peran Anda untuk masuk.</p>
+                            <div class="flex gap-4 mb-8 bg-slate-50 p-2 rounded-2xl border border-slate-200">
+                                <button onclick="switchAuthRole('teacher')" id="btn-teacher" class="flex-1 py-3 rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 shadow-lg bg-brand-600 text-white transform scale-[1.02]">
+                                    <span class="material-symbols-rounded">person_apron</span> Teacher
+                                </button>
+                                <button onclick="switchAuthRole('student')" id="btn-student" class="flex-1 py-3 rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 text-slate-500 hover:bg-slate-200">
+                                    <span class="material-symbols-rounded">school</span> Student
+                                </button>
+                            </div>
+                            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Address</label>
+                                    <input type="email" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none transition-all" placeholder="name@school.edu">
+                                </div>
+                                <div id="class-code-field" class="hidden">
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">Class Code</label>
+                                    <input type="text" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none uppercase tracking-widest placeholder:normal-case" placeholder="e.g. CLASS-2024">
+                                </div>
+                                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+                                    Sign In <span class="material-symbols-rounded">arrow_forward</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function switchAuthRole(role) {
+            appState.currentUserRole = role;
+            const btnT = document.getElementById('btn-teacher');
+            const btnS = document.getElementById('btn-student');
+            const codeField = document.getElementById('class-code-field');
+            const activeClass = "flex-1 py-3 rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 shadow-lg bg-brand-600 text-white transform scale-[1.02]";
+            const inactiveClass = "flex-1 py-3 rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 text-slate-500 hover:bg-slate-200";
+
+            if (role === 'teacher') {
+                btnT.className = activeClass;
+                btnS.className = inactiveClass;
+                codeField.classList.add('hidden');
+            } else {
+                btnS.className = activeClass;
+                btnT.className = inactiveClass;
+                codeField.classList.remove('hidden');
+                codeField.classList.add('animate-fade-in');
+            }
+        }
+
+        function handleLogin() {
+            const role = appState.currentUserRole;
+            showToast(`Logging in as ${role}...`, 'loading');
+            setTimeout(() => {
+                navigate(role === 'teacher' ? 'teacher_dash' : 'student_dash');
+                document.getElementById('toast-container').innerHTML = '';
+                showToast(`Welcome back!`);
+            }, 800);
+        }
+
+        // --- TEACHER DASHBOARD ---
+        function renderTeacherDash(container) {
+            container.innerHTML = `
+                <div class="flex h-full bg-slate-50">
+                    ${getSidebarHTML('teacher_dash')}
+                    <main class="flex-1 overflow-y-auto p-8 animate-fade-in">
+                        <header class="flex justify-between items-center mb-8">
+                            <h1 class="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
+                            <button onclick="navigate('quiz_editor')" class="bg-brand-600 text-white px-5 py-2 rounded-lg text-sm font-bold shadow hover:bg-brand-700 flex items-center gap-2">
+                                <span class="material-symbols-rounded">add</span> Create Quiz
+                            </button>
+                        </header>
+                        <div class="grid grid-cols-3 gap-6 mb-8">
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 text-sm">Active Students</p><h3 class="text-3xl font-bold">124</h3></div>
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 text-sm">Avg Score</p><h3 class="text-3xl font-bold">82%</h3></div>
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 text-sm">Pending Grading</p><h3 class="text-3xl font-bold">15</h3></div>
+                        </div>
+                        <div class="bg-white border border-slate-200 rounded-xl p-6">
+                            <h3 class="font-bold mb-4">Recent Quiz Activity</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center p-3 hover:bg-slate-50 rounded-lg transition">
+                                    <div class="flex items-center gap-3"><span class="material-symbols-rounded text-brand-600 bg-brand-50 p-2 rounded">science</span> <span class="font-medium">Physics 101</span></div>
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Active</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 hover:bg-slate-50 rounded-lg transition">
+                                    <div class="flex items-center gap-3"><span class="material-symbols-rounded text-orange-600 bg-orange-50 p-2 rounded">history_edu</span> <span class="font-medium">History Essay</span></div>
+                                    <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-bold">Grading</span>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        // --- 5. RESTORED & FILLED PAGE RENDERERS ---
+
+        // PAGE - MY CLASSES (CONTENT RESTORED)
+        function renderMyClasses(container) {
+            container.innerHTML = `
+                <div class="flex h-full bg-slate-50">
+                    ${getSidebarHTML('my_classes')}
+                    <main class="flex-1 overflow-y-auto p-8 animate-fade-in">
+                        <header class="flex justify-between items-end mb-8">
+                            <div>
+                                <h1 class="text-2xl font-bold text-slate-900">My Classes & Students</h1>
+                                <p class="text-slate-500 text-sm mt-1">Manage rosters and student performance.</p>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-50">Export Data</button>
+                                <button class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-brand-700 flex items-center gap-2">
+                                    <span class="material-symbols-rounded text-lg">add</span> New Class
+                                </button>
+                            </div>
+                        </header>
+
+                        <!-- Class Cards Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            <!-- Class 1 -->
+                            <div class="bg-white border-2 border-brand-600 rounded-xl p-6 shadow-md relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all">
+                                <div class="absolute top-0 right-0 bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">Active</div>
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="p-3 bg-blue-100 text-brand-600 rounded-xl">
+                                        <span class="material-symbols-rounded text-2xl">biotech</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-slate-900 text-lg">AP Biology</h3>
+                                        <p class="text-xs text-slate-500">Period 2 • 28 Students</p>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center text-sm border-t border-slate-100 pt-4 mt-2">
+                                    <span class="text-slate-500 font-mono bg-slate-100 px-2 py-1 rounded">#BIO-2024</span>
+                                    <span class="text-brand-600 font-bold group-hover:underline">View Roster</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Class 2 -->
+                            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:border-brand-400 hover:shadow-md transition-all cursor-pointer">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="p-3 bg-purple-100 text-purple-600 rounded-xl">
+                                        <span class="material-symbols-rounded text-2xl">history_edu</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-slate-900 text-lg">World History</h3>
+                                        <p class="text-xs text-slate-500">Period 4 • 32 Students</p>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center text-sm border-t border-slate-100 pt-4 mt-2">
+                                    <span class="text-slate-500 font-mono bg-slate-100 px-2 py-1 rounded">#HIST-101</span>
+                                    <span class="text-slate-400 font-bold group-hover:text-brand-600">View Roster</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Roster Table -->
+                        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                                <h3 class="font-bold text-slate-800">Class Roster: AP Biology</h3>
+                                <div class="relative">
+                                    <span class="material-symbols-rounded absolute left-3 top-2 text-slate-400 text-sm">search</span>
+                                    <input type="text" placeholder="Search student..." class="pl-9 pr-4 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-1 focus:ring-brand-500 outline-none">
+                                </div>
+                            </div>
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-500 font-semibold uppercase text-xs">
+                                    <tr>
+                                        <th class="px-6 py-3 w-10"><input type="checkbox" class="rounded"></th>
+                                        <th class="px-6 py-3">Student Name</th>
+                                        <th class="px-6 py-3">Attendance</th>
+                                        <th class="px-6 py-3">Avg Grade</th>
+                                        <th class="px-6 py-3 text-right">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-6 py-4"><input type="checkbox" class="rounded"></td>
+                                        <td class="px-6 py-4 flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-slate-200 bg-[url('https://i.pravatar.cc/150?img=5')] bg-cover"></div>
+                                            <div>
+                                                <p class="font-bold text-slate-900">Sarah Jenkins</p>
+                                                <p class="text-xs text-slate-500">sarah.j@school.edu</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">95%</span></td>
+                                        <td class="px-6 py-4 font-bold text-slate-700">92% (A)</td>
+                                        <td class="px-6 py-4 text-right"><span class="text-xs font-medium text-slate-400">Active</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-6 py-4"><input type="checkbox" class="rounded"></td>
+                                        <td class="px-6 py-4 flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-slate-200 bg-[url('https://i.pravatar.cc/150?img=3')] bg-cover"></div>
+                                            <div>
+                                                <p class="font-bold text-slate-900">Michael Chen</p>
+                                                <p class="text-xs text-slate-500">m.chen@school.edu</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-bold">82%</span></td>
+                                        <td class="px-6 py-4 font-bold text-slate-700">85% (B)</td>
+                                        <td class="px-6 py-4 text-right"><span class="text-xs font-medium text-slate-400">Learning</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        // QUIZ EDITOR (CONTENT RESTORED)
+        function renderQuizEditor(container) {
+            container.innerHTML = `
+                <div class="flex h-full bg-slate-50 overflow-hidden">
+                    ${getSidebarHTML('quiz_editor')}
+                    
+                    <div class="flex-1 flex flex-col h-full animate-fade-in">
+                        <!-- Toolbar -->
+                        <div class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shrink-0">
+                            <div class="flex items-center gap-4">
+                                <h2 class="font-bold text-lg text-slate-800">Smart Quiz Editor</h2>
+                                <span class="bg-brand-100 text-brand-700 text-xs px-2 py-1 rounded font-bold">AI Enabled</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button class="text-slate-500 font-bold text-sm hover:text-slate-800">Save Draft</button>
+                                <button class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-brand-700">Publish Quiz</button>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-1 overflow-hidden">
+                            <!-- Settings Panel -->
+                            <div class="w-72 bg-white border-r border-slate-200 p-6 flex flex-col gap-6 overflow-y-auto hidden md:flex">
+                                <div>
+                                    <label class="text-xs font-bold text-slate-400 uppercase">AI Engine</label>
+                                    <select class="w-full mt-2 p-2 bg-slate-50 border border-slate-200 rounded text-sm"><option>Gemini 1.5</option><option>Qwen 2.5</option></select>
+                                </div>
+                                <div class="p-4 border-2 border-dashed border-slate-200 rounded-xl text-center bg-slate-50">
+                                    <span class="material-symbols-rounded text-slate-400 text-3xl">cloud_upload</span>
+                                    <p class="text-xs text-slate-500 mt-2 font-bold">Upload Material</p>
+                                </div>
+                            </div>
+
+                            <!-- Canvas -->
+                            <div class="flex-1 p-8 overflow-y-auto bg-slate-50/50">
+                                <div class="max-w-2xl mx-auto space-y-6">
+                                    <!-- Question Block -->
+                                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative group ring-2 ring-transparent hover:ring-brand-100 transition-all">
+                                        <div class="flex justify-between mb-2">
+                                            <span class="text-xs font-bold text-slate-400 uppercase">Question 1 (Essay)</span>
+                                            <button class="text-slate-300 hover:text-red-500"><span class="material-symbols-rounded">delete</span></button>
+                                        </div>
+                                        <input type="text" class="w-full text-lg font-medium border-none p-0 focus:ring-0 placeholder:text-slate-300" 
+                                            placeholder="Enter question text..." 
+                                            value="Explain the impact of the Industrial Revolution on urban planning."
+                                            oninput="document.getElementById('mobile_preview_text').innerText = this.value">
+                                        
+                                        <div class="mt-4 bg-brand-50 p-3 rounded-lg border border-brand-100">
+                                            <p class="text-xs font-bold text-brand-700 mb-1 flex items-center gap-1"><span class="material-symbols-rounded text-sm">psychology</span> AI Rubric Keywords</p>
+                                            <div class="flex gap-2">
+                                                <span class="bg-white text-brand-600 px-2 py-1 rounded text-xs border border-brand-200">Urbanization</span>
+                                                <span class="bg-white text-brand-600 px-2 py-1 rounded text-xs border border-brand-200">Factory System</span>
+                                                <span class="text-xs text-brand-400 flex items-center cursor-pointer">+ Add</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="w-full py-4 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:border-brand-400 hover:text-brand-500 hover:bg-white transition-all flex items-center justify-center gap-2">
+                                        <span class="material-symbols-rounded">add_circle</span> Add Question
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Preview -->
+                            <div class="w-80 bg-slate-100 border-l border-slate-200 p-6 hidden xl:flex flex-col items-center justify-center">
+                                <div class="w-[260px] h-[520px] bg-white rounded-[2.5rem] border-8 border-slate-800 shadow-2xl overflow-hidden relative">
+                                    <div class="absolute top-0 w-full h-6 bg-slate-800 flex justify-center"><div class="w-20 h-4 bg-slate-800 rounded-b-xl"></div></div>
+                                    <div class="pt-12 px-4 h-full bg-slate-50 overflow-y-auto">
+                                        <div class="bg-white p-3 rounded-lg shadow-sm border border-slate-100 mb-3">
+                                            <p id="mobile_preview_text" class="text-xs font-bold text-slate-800">Explain the impact of the Industrial Revolution on urban planning.</p>
+                                            <div class="h-16 bg-slate-50 mt-2 rounded border border-slate-100"></div>
+                                        </div>
+                                        <button class="w-full bg-brand-600 text-white text-[10px] py-2 rounded font-bold">Submit Answer</button>
+                                    </div>
+                                </div>
+                                <p class="text-xs font-bold text-slate-400 mt-4 uppercase tracking-widest">Mobile Preview</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // PAGE - REPORTS (CONTENT RESTORED)
+        function renderReports(container) {
+            container.innerHTML = `
+                <div class="flex h-full bg-slate-50">
+                    ${getSidebarHTML('reports')}
+                    <main class="flex-1 overflow-y-auto p-8 animate-fade-in">
+                        <header class="mb-8">
+                            <h1 class="text-2xl font-bold text-slate-900">Reports & Analytics</h1>
+                            <p class="text-slate-500 text-sm">Performance insights based on AI grading.</p>
+                        </header>
+
+                        <!-- Top Metrics -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Avg Class Score</p>
+                                <p class="text-2xl font-bold text-slate-900 mt-1">84%</p>
+                                <span class="text-xs text-green-600 font-bold">+2.4% vs last term</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Grading Time Saved</p>
+                                <p class="text-2xl font-bold text-slate-900 mt-1">12hrs</p>
+                                <span class="text-xs text-brand-600 font-bold">AI Efficiency</span>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Assignments Graded</p>
+                                <p class="text-2xl font-bold text-slate-900 mt-1">142</p>
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Weakest Topic</p>
+                                <p class="text-lg font-bold text-red-500 mt-1 truncate">Photosynthesis</p>
+                                <span class="text-xs text-slate-400">Needs review</span>
+                            </div>
+                        </div>
+
+                        <!-- Chart & Topics -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                            <!-- Main Chart -->
+                            <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-slate-800 mb-4">Class Score Trends</h3>
+                                <div class="h-64 w-full relative flex items-end justify-between px-4 pb-4 border-b border-l border-slate-200 bg-slate-50/50 rounded-lg overflow-hidden">
+                                    <!-- Simple CSS Chart Bars -->
+                                    <div class="w-8 bg-brand-200 h-[40%] rounded-t hover:bg-brand-500 transition-colors relative group"><span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold">40%</span></div>
+                                    <div class="w-8 bg-brand-300 h-[60%] rounded-t hover:bg-brand-500 transition-colors relative group"><span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold">60%</span></div>
+                                    <div class="w-8 bg-brand-400 h-[55%] rounded-t hover:bg-brand-500 transition-colors relative group"><span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold">55%</span></div>
+                                    <div class="w-8 bg-brand-500 h-[75%] rounded-t hover:bg-brand-600 transition-colors relative group"><span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold">75%</span></div>
+                                    <div class="w-8 bg-brand-600 h-[85%] rounded-t hover:bg-brand-700 transition-colors relative group"><span class="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold">85%</span></div>
+                                </div>
+                                <div class="flex justify-between px-4 mt-2 text-xs text-slate-400 font-bold uppercase">
+                                    <span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                                </div>
+                            </div>
+
+                            <!-- Weakest Topics List -->
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-slate-800 mb-4">Topic Performance</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1"><span>Cell Division</span><span class="text-green-600">88%</span></div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full w-[88%] bg-green-500"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1"><span>Genetics</span><span class="text-yellow-600">72%</span></div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full w-[72%] bg-yellow-500"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold mb-1"><span>Photosynthesis</span><span class="text-red-600">54%</span></div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full w-[54%] bg-red-500"></div></div>
+                                        <p class="text-[10px] text-red-500 mt-1 flex items-center gap-1"><span class="material-symbols-rounded text-sm">warning</span> Struggling concept</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        // STUDENT DASHBOARD
+        function renderStudentDash(container) {
+            const data = appState.studentData;
+            container.innerHTML = `
+                <div class="flex h-full bg-slate-50">
+                    ${getSidebarHTML('student_dash')}
+                    <main class="flex-1 overflow-y-auto p-8 animate-fade-in">
+                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-4">
+                            <div>
+                                <h1 class="text-3xl font-display font-bold text-slate-900">Student Dashboard</h1>
+                                <p class="text-slate-500">Track your progress and exams.</p>
+                            </div>
+                            <div class="bg-white p-2 pl-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-2 w-full lg:w-auto">
+                                <span class="material-symbols-rounded text-slate-400">qr_code</span>
+                                <input type="text" placeholder="Enter Class Code" class="outline-none text-sm w-32 md:w-48 text-slate-700 font-medium">
+                                <button onclick="showToast('Class joined successfully!')" class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-brand-700 transition-colors">Join</button>
+                            </div>
+                        </div>
+                        ${data.activeExams.length > 0 ? `
+                        <div class="mb-8">
+                            <h2 class="text-sm font-bold text-slate-500 uppercase mb-3 tracking-wider flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Active Now</h2>
+                            <div class="grid gap-4">
+                                ${data.activeExams.map(exam => `
+                                    <div class="bg-white border-l-4 border-brand-600 rounded-xl p-6 shadow-md flex justify-between items-center relative overflow-hidden group">
+                                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span class="material-symbols-rounded text-6xl text-brand-600">timer</span></div>
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="bg-brand-100 text-brand-700 text-xs font-bold px-2 py-0.5 rounded">${exam.subject}</span>
+                                                <span class="text-xs text-slate-400 font-mono">Time Left: ${exam.timeLeft}</span>
+                                            </div>
+                                            <h3 class="text-xl font-bold text-slate-900">${exam.title}</h3>
+                                            <div class="w-full max-w-xs h-1.5 bg-slate-100 rounded-full mt-3 overflow-hidden">
+                                                <div class="bg-brand-600 h-full rounded-full" style="width: ${exam.progress}%"></div>
+                                            </div>
+                                            <p class="text-xs text-slate-400 mt-1">${exam.progress}% Completed</p>
+                                        </div>
+                                        <button onclick="navigate('exam')" class="bg-brand-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-brand-700 transition-all z-10">Continue Exam</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h2 class="text-sm font-bold text-slate-500 uppercase mb-3 tracking-wider">Upcoming Exams</h2>
+                                <div class="space-y-3">
+                                    ${data.upcomingExams.map(exam => `
+                                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex justify-between items-center group">
+                                            <div class="flex items-center gap-4">
+                                                <div class="size-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
+                                                    <span class="material-symbols-rounded text-2xl">event_note</span>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-slate-900">${exam.title}</h4>
+                                                    <p class="text-xs text-slate-500 font-medium">Due: <span class="text-red-500">${exam.dueDate}</span></p>
+                                                </div>
+                                            </div>
+                                            <button class="text-slate-400 hover:text-brand-600 border border-slate-200 hover:border-brand-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">Start</button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-slate-500 uppercase mb-3 tracking-wider">Recent Grades</h2>
+                                <div class="space-y-3">
+                                    ${data.completedExams.map(exam => `
+                                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center cursor-pointer hover:bg-slate-50" onclick="navigate('leaderboard')">
+                                            <div class="flex items-center gap-4">
+                                                <div class="size-12 rounded-xl ${exam.grade === 'A' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'} flex items-center justify-center font-bold text-xl">
+                                                    ${exam.grade}
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-slate-900">${exam.title}</h4>
+                                                    <p class="text-xs text-slate-500">Completed ${exam.date}</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="block text-lg font-bold text-slate-900">${exam.score}</span>
+                                                <span class="text-[10px] text-slate-400 uppercase font-bold">Points</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                    <button onclick="navigate('leaderboard')" class="w-full py-3 text-sm text-brand-600 font-bold hover:bg-brand-50 rounded-xl transition-colors dashed border border-brand-200">View Full Leaderboard</button>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function renderSettings(container) {
+            container.innerHTML = `
+                <div class="flex h-full bg-slate-50">
+                    ${getSidebarHTML('settings')}
+                    <main class="flex-1 overflow-y-auto p-8 animate-fade-in">
+                        <header class="mb-8">
+                            <h1 class="text-2xl font-bold text-slate-900">Settings</h1>
+                            <p class="text-slate-500 text-sm">Manage profile & preferences.</p>
+                        </header>
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm max-w-2xl">
+                            <div class="p-6 border-b border-slate-100">
+                                <h3 class="font-bold text-slate-800">Profile Information</h3>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <img src="https://i.pravatar.cc/150?img=${appState.currentUserRole === 'teacher' ? 11 : 5}" class="w-16 h-16 rounded-full">
+                                    <button class="text-sm font-bold text-brand-600 border border-brand-200 px-3 py-1 rounded hover:bg-brand-50">Change Photo</button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div><label class="text-xs font-bold text-slate-500">First Name</label><input type="text" value="Alex" class="w-full border border-slate-200 rounded p-2 mt-1"></div>
+                                    <div><label class="text-xs font-bold text-slate-500">Last Name</label><input type="text" value="Doe" class="w-full border border-slate-200 rounded p-2 mt-1"></div>
+                                </div>
+                                <div><label class="text-xs font-bold text-slate-500">Email</label><input type="email" value="alex@school.edu" class="w-full border border-slate-200 rounded p-2 mt-1"></div>
+                            </div>
+                            <div class="p-4 bg-slate-50 border-t border-slate-100 text-right">
+                                <button onclick="showToast('Settings Saved')" class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Save Changes</button>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function renderLeaderboard(container) {
+            container.innerHTML = `
+                <div class="flex h-full bg-slate-50">
+                    ${getSidebarHTML('leaderboard')}
+                    <main class="flex-1 overflow-y-auto p-8 animate-fade-in">
+                        <header class="flex items-center gap-4 mb-8">
+                            <button onclick="navigate('student_dash')" class="bg-white p-2 rounded-full shadow-sm hover:bg-slate-100"><span class="material-symbols-rounded">arrow_back</span></button>
+                            <div>
+                                <h1 class="text-2xl font-bold text-slate-900">Leaderboard & Grades</h1>
+                                <p class="text-slate-500 text-sm">See how you stack up!</p>
+                            </div>
+                        </header>
+                        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl p-8 text-white mb-8 relative overflow-hidden flex flex-col items-center">
+                            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                            <h2 class="text-xl font-bold mb-6 z-10">Class Rankings: Physics</h2>
+                            <div class="flex items-end gap-4 z-10">
+                                <div class="flex flex-col items-center"><img src="https://i.pravatar.cc/150?img=5" class="w-12 h-12 rounded-full border-2 border-slate-400 mb-2"><div class="h-16 w-16 bg-slate-700 rounded-t-lg flex items-center justify-center font-bold">2</div></div>
+                                <div class="flex flex-col items-center"><span class="text-2xl mb-1">👑</span><img src="https://i.pravatar.cc/150?img=11" class="w-16 h-16 rounded-full border-2 border-yellow-400 mb-2 shadow-lg shadow-yellow-500/50"><div class="h-24 w-20 bg-gradient-to-b from-yellow-500 to-yellow-700 rounded-t-lg flex items-center justify-center font-bold text-2xl shadow-lg">1</div></div>
+                                <div class="flex flex-col items-center"><img src="https://i.pravatar.cc/150?img=8" class="w-12 h-12 rounded-full border-2 border-orange-700 mb-2"><div class="h-12 w-16 bg-slate-800 rounded-t-lg flex items-center justify-center font-bold">3</div></div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-500 font-semibold">
+                                    <tr><th class="px-6 py-3">Rank</th><th class="px-6 py-3">Student</th><th class="px-6 py-3 text-right">Score</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr class="bg-yellow-50"><td class="px-6 py-3 font-bold text-yellow-700">#1</td><td class="px-6 py-3 font-bold">Alex (You)</td><td class="px-6 py-3 text-right font-bold">980 pts</td></tr>
+                                    <tr><td class="px-6 py-3 text-slate-500">#2</td><td class="px-6 py-3">Sarah S.</td><td class="px-6 py-3 text-right">945 pts</td></tr>
+                                    <tr><td class="px-6 py-3 text-slate-500">#3</td><td class="px-6 py-3">Mike R.</td><td class="px-6 py-3 text-right">890 pts</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </main>
+                </div>
+            `;
+        }
+
+        function renderExam(container) {
+            appState.timer = 3600;
+            appState.timerInterval = setInterval(() => {
+                appState.timer--;
+                const el = document.getElementById('exam-timer');
+                if(el) el.innerText = new Date(appState.timer * 1000).toISOString().substr(14, 5);
+            }, 1000);
+            container.innerHTML = `<div class="h-full flex flex-col bg-white"><header class="h-16 border-b flex items-center justify-between px-8"><h1 class="font-bold">Physics Mid-Term</h1><div class="font-mono bg-slate-100 px-3 py-1 rounded" id="exam-timer">60:00</div></header><main class="flex-1 p-12 max-w-3xl mx-auto"><h2 class="text-2xl font-bold mb-4">Question 1</h2><p class="mb-4">Explain Newton's First Law.</p><textarea class="w-full h-64 border rounded p-4"></textarea><div class="mt-4 flex justify-between"><button onclick="navigate('student_dash')" class="text-slate-500">Exit</button><button onclick="navigate('leaderboard')" class="bg-brand-600 text-white px-6 py-2 rounded">Submit</button></div></main></div>`;
+        }
+        function renderAdmin(container) { container.innerHTML = `<div class="flex h-full items-center justify-center">Admin Portal</div>`; }
+
+        function showToast(msg, type) {
+            const t = document.createElement('div');
+            t.className = "bg-slate-800 text-white px-4 py-2 rounded shadow-lg animate-fade-in";
+            t.innerText = msg;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(() => t.remove(), 2000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
